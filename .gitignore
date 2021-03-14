@@ -2,3 +2,4 @@
 **/*.pyc
 caffe
 *.kdev4
+models/
