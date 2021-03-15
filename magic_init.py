@@ -52,17 +52,20 @@ def gatherInputData(net, layer_id, bottom_data, top_name, fast=False, max_data=N
 
         # Note this could cause some memory issues in the FC layers
         W, D = [], []
+        breakpoint()
         for i in range(OS):
+                print(f"in std: {bottom_data['data'][0].var()**.5}")
+                print(f"out mean: {bottom_data['data'][0].mean()}")
                 d = l.blobs[0].data
                 d[...] = np.random.normal(0, 1, d.shape)
                 W.append(1*d)
                 # Collect the data and flatten out the convs
                 data = [i for i in forward(net, layer_id, NIT, bottom_data, [top_name])[top_name]]
-                breakpoint()
                 print(len(data))
                 print("data[0] ", data[0].shape)
                 #print([[i.shape for i in j] for j in data])
-                print(data[0].shape)
+                print(f"out std: {data[0].var() ** 0.5}")
+                print(f"out mean: {data[0].mean()}")
                 data2 = data
                 data = np.concatenate([i.swapaxes(0, 1).reshape((i.shape[1],-1)).T for i in data], axis = 0)
                 print(data.shape)
@@ -92,6 +95,7 @@ def initializeWeight(D, type, N_OUT):
                 print("  Not enough data for '%s' estimation, using elwise" % type)
                 return np.random.normal(0, 1, (N_OUT,D.shape[1]))
 
+        breakpoint()
         D = D - np.mean(D, axis=0, keepdims=True)
         # PCA, ZCA, K-Means
         assert type in ['pca', 'zca', 'kmeans', 'rand'], "Unknown initialization type '%s'"%type
@@ -106,6 +110,7 @@ def initializeWeight(D, type, N_OUT):
         S = np.diag(s)
         if type == 'pca':
                 pcaw =  S.dot(V.T)
+                # breakpoint()
                 print(f"N_OUT: {N_OUT}")
                 return pcaw
         elif type == 'zca':
@@ -397,7 +402,8 @@ def netFromString(s, t=None):
 def getFileList(f):
         from glob import glob
         from os import path
-        return [f for f in glob(f) if path.isfile(f)]
+        fileList =  [f for f in glob(f) if path.isfile(f)]
+        return fileList
 
 def main():
         from argparse import ArgumentParser
