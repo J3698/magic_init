@@ -3,3 +3,4 @@
 caffe
 *.kdev4
 models/
+data/
